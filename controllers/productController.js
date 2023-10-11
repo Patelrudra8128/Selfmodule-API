@@ -1,5 +1,6 @@
 const productTbl = require('../models/productTbl');
 const subcategoryTbl = require('../models/subcategoryTbl');
+const categoryTbl = require('../models/categoryTbl');
 const fs = require('fs')
 
 const addProduct = async (req,res) => {
@@ -28,13 +29,24 @@ const addProduct = async (req,res) => {
 const viewProduct = async (req,res) => {
     try {
         // let ProductData = await productTbl.find({}).populate('category').populate('subcategory');
-        let ProductData = await subcategoryTbl.aggregate([
+        let ProductData = await categoryTbl.aggregate([
+            {
+                $lookup : {
+                    from : "subcategories",
+                    localField : "_id",
+                    foreignField : "categoryId",
+                    as : 'Subcategory'
+                }
+            },
+            {
+                $unwind : '$Subcategory'
+            },
             {
                 $lookup : {
                     from : "products",
-                    localField : "_id",
+                    localField : "Subcategory._id",
                     foreignField : "subcategoryId",
-                    as : 'viewProduct'
+                    as : "Product"
                 }
             }
         ])
@@ -52,7 +64,7 @@ const viewProduct = async (req,res) => {
 const deleteProduct = async (req,res) => {
     try{
         let delproduct = await productTbl.findByIdAndDelete(req.body.id);
-        fs.unlinkSync(req.file.path);
+        fs.unlinkSync(delproduct.image);
         if(delproduct){
             return res.json({ message : "Product deleted successfully", status : 1});
         }else{
