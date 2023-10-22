@@ -1,5 +1,6 @@
 const subcategoryTbl = require('../models/subcategoryTbl');
 const categoryTbl = require('../models/categoryTbl');
+const productTbl = require('../models/productTbl');
 
 const addSubcategory = async (req,res) => {
     let insertSubcategory = await subcategoryTbl.create({
@@ -38,8 +39,14 @@ const viewSubcategory = async (req,res) => {
 
 const deleteSubcategory = async (req,res) => {
     try{
-        let delSubcategory = await subcategoryTbl.findByIdAndDelete(req.body.id);
+        let id = req.body.id;
+        let delSubcategory = await subcategoryTbl.findByIdAndDelete(id);
         if(delSubcategory){
+            let productsDelete = await productTbl.find({ subcategoryId : id});
+            for(let product of productsDelete){
+                    fs.unlinkSync(product.image);
+                    await productTbl.findByIdAndDelete(product._id);
+                }
             return res.json({message : "Subcategory deleted successfully", status : 1});
         }else{
             return res.json({message : "Subcategory not deleted", status : 0});

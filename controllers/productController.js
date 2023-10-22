@@ -63,21 +63,51 @@ const viewProduct = async (req,res) => {
 
 const deleteProduct = async (req,res) => {
     try{
-        let delproduct = await productTbl.findByIdAndDelete(req.body.id);
-        fs.unlinkSync(delproduct.image);
-        if(delproduct){
-            return res.json({ message : "Product deleted successfully", status : 1});
-        }else{
-            return res.json({ message  : "Product not deleted", status : 0});
-        }
+        let product = await productTbl.findById(req.body.id);
+            if(product){
+                fs.unlinkSync(product.image);
+                let delproduct = await productTbl.findByIdAndDelete(product.id);
+                if(delproduct){
+                    return res.json({ message : "Product deleted successfully", status : 1});
+                }else{
+                    return res.json({ message  : "Product not deleted", status : 0});
+                }
+            }else{
+                return res.json({ message : "Product not found", status : 0});
+            }
     }catch(err){
         console.log(err);
         return false;
     }
 }
 
+// const updateProduct = async (req,res) => {
+//     try{
+//         const{categoryId,subcategoryId,product,quantity,description,price} = req.body;
+//         let productData = await productTbl.findByIdAndUpdate(req.body.id,{
+//             categoryId : categoryId,
+//             subcategoryId : subcategoryId,
+//             product : product,
+//             quantity : quantity,
+//             description : description,
+//             price : price,
+//             image : req.file.path
+//         });
+//         console.log(productData);
+//         // if(product){
+            
+//         // }else{
+//         //     return res.json({ message : "Product not found", status : 0});
+//         // }
+//     }catch(err){
+//         console.log(err);
+//         return false;
+//     }
+// }
+
 module.exports = {
     addProduct,
     viewProduct,
-    deleteProduct
+    deleteProduct,
+    // updateProduct
 }

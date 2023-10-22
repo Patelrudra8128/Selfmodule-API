@@ -5,6 +5,7 @@ const registerController = require('../controllers/registerController');
 const categoryController = require('../controllers/categoryController');
 const subcategoryController = require('../controllers/subcategoryController');
 const productController = require('../controllers/productController');
+const cartController = require('../controllers/cartController');
 const multer = require('multer');
 
 const passport = require('passport');
@@ -42,5 +43,10 @@ routes.put('/updateSubcategory',subcategoryController.updateSubcategory);
 routes.post('/addProduct',imageUpload,productController.addProduct);
 routes.get('/viewProduct',productController.viewProduct);
 routes.delete('/deleteProduct',productController.deleteProduct);
+// routes.put('/updateProduct',productController.updateProduct);
+
+routes.post('/addtoCart',cartController.addtoCart);
+routes.get("/viewCart",cartController.viewCart);
+routes.delete('/deleteCart',cartController.deleteCart);
 
 module.exports = routes;
